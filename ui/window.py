@@ -1,11 +1,15 @@
 from tkinter import  *
+
+import imageio as imageio
 from PIL import Image, ImageTk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
+import cv2
 
 
 class Window(Frame):
     title = "Traffic Violation System"
     home_banner_image = "assets/images/homepage.jpg"
+    generated_image_path = "assets/images/generated/preview.png"
     program_instructions = """
     Step to run this program :
     1> Choose a recorded video from below button
@@ -35,7 +39,22 @@ class Window(Frame):
         menu.add_cascade(label="File", menu=file)
 
     def open_file(self):
-        self.filename = filedialog.askopenfilename()
+        self.selectedFileName = filedialog.askopenfilename()
+
+        cap = cv2.VideoCapture(self.selectedFileName)
+
+        try:
+            reader = imageio.get_reader(self.selectedFileName)
+            fps = reader.get_meta_data()['fps']
+
+            ret, image = cap.read()
+            cv2.imwrite(self.generated_image_path,
+                        image)
+
+            self.show_image(self.generated_image_path)
+        except:
+            messagebox.showerror("showerror", "Import a Valid video File")
+
 
     def renderUI(self):
         self.imgSize = Image.open(self.home_banner_image)
@@ -54,3 +73,14 @@ class Window(Frame):
 
     def addEmptyLine(self):
         Label(text = "").pack()
+
+    def show_image(self, frame):
+        self.imgSize = Image.open(frame)
+        self.tkimage = ImageTk.PhotoImage(self.imgSize)
+        self.w, self.h = (800, 300)
+
+        self.canvas.destroy()
+
+        self.canvas = Canvas(master=self.master, width=self.w, height=self.h)
+        self.canvas.create_image(0, 0, image=self.tkimage, anchor='nw')
+        self.canvas.pack()
