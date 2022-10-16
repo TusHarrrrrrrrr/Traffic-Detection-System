@@ -1,13 +1,25 @@
 from tkinter import  *
+from PIL import Image, ImageTk
+from tkinter import filedialog
+
 
 class Window(Frame):
     title = "Traffic Violation System"
+    home_banner_image = "assets/images/homepage.jpg"
+    program_instructions = """
+    Step to run this program :
+    1> Choose a recorded video from below button
+    2> After Selecting, draw anchor points by clicking analyse video from button below video preview
+    3> Program will detect vehicles in the video and automatically stores frames of vehicle going past the anchor points
+    """
     def __init__(self, master=None):
         Frame.__init__(self, master)
 
         self.master = master
         self.setup_window()
         self.createMenuOptions()
+
+        self.renderUI()
 
     def setup_window(self):
         w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
@@ -19,9 +31,26 @@ class Window(Frame):
         self.master.config(menu=menu)
 
         file = Menu(menu)
-        file.add_command(label="Open Video", command=self.open_file)
         file.add_command(label="Exit App", command=exit)
         menu.add_cascade(label="File", menu=file)
 
     def open_file(self):
-        pass
+        self.filename = filedialog.askopenfilename()
+
+    def renderUI(self):
+        self.imgSize = Image.open(self.home_banner_image)
+        self.tkimage = ImageTk.PhotoImage(self.imgSize)
+        self.w, self.h = (800, 300)
+
+        self.canvas = Canvas(master=self.master, width=self.w, height=self.h)
+        self.canvas.create_image(20, 20, image=self.tkimage, anchor='center')
+        self.canvas.pack()
+
+        label = Label(self.master,text=self.program_instructions)
+        label.pack()
+
+        btn = Button(text = "Open video file",command = self.open_file)
+        btn.pack()
+
+    def addEmptyLine(self):
+        Label(text = "").pack()
