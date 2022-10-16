@@ -9,6 +9,7 @@ import cv2
 class Window(Frame):
     title = "Traffic Violation System"
     home_banner_image = "assets/images/homepage.jpg"
+    # first frame of the selected will be shown at this
     generated_image_path = "assets/images/generated/preview.png"
     program_instructions = """
     Step to run this program :
@@ -16,6 +17,9 @@ class Window(Frame):
     2> After Selecting, draw anchor points by clicking analyse video from button below video preview
     3> Program will detect vehicles in the video and automatically stores frames of vehicle going past the anchor points
     """
+
+    # used to store a history of packed widgets
+    widget_history = []
     def __init__(self, master=None):
         Frame.__init__(self, master)
 
@@ -53,7 +57,7 @@ class Window(Frame):
 
             self.show_image(self.generated_image_path)
         except:
-            messagebox.showerror("showerror", "Import a Valid video File")
+            messagebox.showerror("Error Occurred", "Import a Valid video File")
 
 
     def renderUI(self):
@@ -67,12 +71,16 @@ class Window(Frame):
 
         label = Label(self.master,text=self.program_instructions)
         label.pack()
+        self.widget_history.append(label)
 
         btn = Button(text = "Open video file",command = self.open_file)
         btn.pack()
+        self.widget_history.append(btn)
 
     def addEmptyLine(self):
-        Label(text = "").pack()
+        br = Label(text = "")
+        br.pack()
+        self.widget_history.append(br)
 
     def show_image(self, frame):
         self.imgSize = Image.open(frame)
@@ -80,7 +88,15 @@ class Window(Frame):
         self.w, self.h = (800, 300)
 
         self.canvas.destroy()
+        for w in self.widget_history:
+            w.pack_forget()
 
         self.canvas = Canvas(master=self.master, width=self.w, height=self.h)
         self.canvas.create_image(0, 0, image=self.tkimage, anchor='nw')
         self.canvas.pack()
+
+        analyze_btn = Button(text = "Analyze video",command = self.analyze_video)
+        analyze_btn.pack()
+
+    def analyze_video(self):
+        messagebox.showinfo("TODO","Video analyzing not implemented")
